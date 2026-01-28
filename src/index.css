@@ -1,0 +1,179 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dark futuristic theme with teal accents */
+    --background: 220 25% 6%;
+    --foreground: 200 20% 95%;
+
+    --card: 220 25% 10%;
+    --card-foreground: 200 20% 95%;
+
+    --popover: 220 25% 8%;
+    --popover-foreground: 200 20% 95%;
+
+    --primary: 185 75% 45%;
+    --primary-foreground: 220 25% 6%;
+
+    --secondary: 220 20% 18%;
+    --secondary-foreground: 200 20% 90%;
+
+    --muted: 220 20% 15%;
+    --muted-foreground: 200 15% 55%;
+
+    --accent: 185 85% 55%;
+    --accent-foreground: 220 25% 6%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 20% 20%;
+    --input: 220 20% 18%;
+    --ring: 185 75% 45%;
+
+    --radius: 0.75rem;
+
+    /* Custom brand colors */
+    --teal: 185 75% 45%;
+    --teal-glow: 185 85% 55%;
+    --teal-dark: 185 65% 30%;
+    --navy: 220 35% 12%;
+    --navy-light: 220 25% 18%;
+    --cyan: 185 90% 60%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(185 75% 45%), hsl(200 80% 50%));
+    --gradient-dark: linear-gradient(180deg, hsl(220 25% 8%), hsl(220 35% 6%));
+    --gradient-glow: linear-gradient(135deg, hsl(185 85% 55% / 0.3), hsl(200 80% 60% / 0.1));
+    --gradient-hero: linear-gradient(180deg, transparent 0%, hsl(220 25% 6% / 0.8) 100%);
+
+    /* Shadows */
+    --shadow-glow: 0 0 30px hsl(185 85% 55% / 0.3);
+    --shadow-card: 0 10px 40px -10px hsl(0 0% 0% / 0.5);
+
+    --sidebar-background: 220 25% 8%;
+    --sidebar-foreground: 200 20% 90%;
+    --sidebar-primary: 185 75% 45%;
+    --sidebar-primary-foreground: 220 25% 6%;
+    --sidebar-accent: 220 20% 15%;
+    --sidebar-accent-foreground: 200 20% 90%;
+    --sidebar-border: 220 20% 20%;
+    --sidebar-ring: 185 75% 45%;
+  }
+
+  .dark {
+    --background: 220 25% 6%;
+    --foreground: 200 20% 95%;
+    --card: 220 25% 10%;
+    --card-foreground: 200 20% 95%;
+    --popover: 220 25% 8%;
+    --popover-foreground: 200 20% 95%;
+    --primary: 185 75% 45%;
+    --primary-foreground: 220 25% 6%;
+    --secondary: 220 20% 18%;
+    --secondary-foreground: 200 20% 90%;
+    --muted: 220 20% 15%;
+    --muted-foreground: 200 15% 55%;
+    --accent: 185 85% 55%;
+    --accent-foreground: 220 25% 6%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 20% 20%;
+    --input: 220 20% 18%;
+    --ring: 185 75% 45%;
+    --sidebar-background: 220 25% 8%;
+    --sidebar-foreground: 200 20% 90%;
+    --sidebar-primary: 185 75% 45%;
+    --sidebar-primary-foreground: 220 25% 6%;
+    --sidebar-accent: 220 20% 15%;
+    --sidebar-accent-foreground: 200 20% 90%;
+    --sidebar-border: 220 20% 20%;
+    --sidebar-ring: 185 75% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', sans-serif;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-primary);
+  }
+
+  .glow-teal {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .glass {
+    @apply bg-card/80 backdrop-blur-xl border border-border/50;
+  }
+
+  .animate-scroll {
+    animation: scroll 40s linear infinite;
+  }
+
+  .animate-scroll-reverse {
+    animation: scroll-reverse 40s linear infinite;
+  }
+
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes scroll-reverse {
+    0% {
+      transform: translateX(-50%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 20px hsl(185 85% 55% / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px hsl(185 85% 55% / 0.5);
+    }
+  }
+}
