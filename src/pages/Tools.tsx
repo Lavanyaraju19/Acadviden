@@ -1,117 +1,211 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
-import { Search, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Search, ExternalLink, Loader2, Plus, Pencil, Trash2, Wrench } from "lucide-react";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import {
-  BarChart3, Mail, Share2, Target, TrendingUp, Users, FileText,
-  Globe, Megaphone, PieChart, Zap, Layers, Video, Image, Palette,
-  MessageSquare, Calendar, Database, Shield, Link, Settings, Terminal,
-  Activity, Award, Bell, Bookmark, Box, Camera, Check, Clock, Cloud,
-  Code, Compass, CreditCard, Download, Edit, Eye, Filter, Flag, Folder,
-  Gift, Heart, HelpCircle, Home, Inbox, Info, Key, Layout, List, Lock,
-  Map, Monitor, Music, Navigation, Package, Paperclip, Phone, Printer,
-  Radio, RefreshCw, Rss, Save, Send, Server, Shuffle, Sliders, Smartphone,
-  Speaker, Star, Sun, Tag, ThumbsUp, Trash, Truck, Tv, Upload, Volume2,
-  Wifi, Wind, Wrench
-} from "lucide-react";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 
-const allTools = [
-  { name: "Google Analytics", icon: BarChart3, category: "Analytics" },
-  { name: "SEMrush", icon: Search, category: "SEO" },
-  { name: "Mailchimp", icon: Mail, category: "Email" },
-  { name: "Hootsuite", icon: Share2, category: "Social Media" },
-  { name: "Google Ads", icon: Target, category: "Advertising" },
-  { name: "Ahrefs", icon: TrendingUp, category: "SEO" },
-  { name: "HubSpot", icon: Users, category: "CRM" },
-  { name: "Buffer", icon: FileText, category: "Social Media" },
-  { name: "Moz", icon: Globe, category: "SEO" },
-  { name: "Sprout Social", icon: Megaphone, category: "Social Media" },
-  { name: "Tableau", icon: PieChart, category: "Analytics" },
-  { name: "Zapier", icon: Zap, category: "Automation" },
-  { name: "Canva", icon: Layers, category: "Design" },
-  { name: "Loom", icon: Video, category: "Video" },
-  { name: "Figma", icon: Image, category: "Design" },
-  { name: "Adobe Suite", icon: Palette, category: "Design" },
-  { name: "Slack", icon: MessageSquare, category: "Communication" },
-  { name: "Calendly", icon: Calendar, category: "Scheduling" },
-  { name: "Notion", icon: Database, category: "Productivity" },
-  { name: "LastPass", icon: Shield, category: "Security" },
-  { name: "Bitly", icon: Link, category: "URL Shortener" },
-  { name: "Trello", icon: Settings, category: "Project Management" },
-  { name: "GitHub", icon: Terminal, category: "Development" },
-  { name: "Hotjar", icon: Activity, category: "Analytics" },
-  { name: "Buzzsumo", icon: Award, category: "Content" },
-  { name: "Mention", icon: Bell, category: "Monitoring" },
-  { name: "Pocket", icon: Bookmark, category: "Content" },
-  { name: "Dropbox", icon: Box, category: "Storage" },
-  { name: "Snapseed", icon: Camera, category: "Design" },
-  { name: "Grammarly", icon: Check, category: "Writing" },
-  { name: "Clockify", icon: Clock, category: "Time Tracking" },
-  { name: "AWS", icon: Cloud, category: "Cloud" },
-  { name: "VS Code", icon: Code, category: "Development" },
-  { name: "Clearbit", icon: Compass, category: "Data" },
-  { name: "Stripe", icon: CreditCard, category: "Payments" },
-  { name: "WeTransfer", icon: Download, category: "File Sharing" },
-  { name: "Hemingway", icon: Edit, category: "Writing" },
-  { name: "Crazy Egg", icon: Eye, category: "Analytics" },
-  { name: "Intercom", icon: Filter, category: "Customer Support" },
-  { name: "ClickUp", icon: Flag, category: "Project Management" },
-  { name: "Google Drive", icon: Folder, category: "Storage" },
-  { name: "ReferralCandy", icon: Gift, category: "Marketing" },
-  { name: "Wishpond", icon: Heart, category: "Landing Pages" },
-  { name: "ChatGPT", icon: HelpCircle, category: "AI" },
-  { name: "WordPress", icon: Home, category: "CMS" },
-  { name: "Front", icon: Inbox, category: "Email" },
-  { name: "Typeform", icon: Info, category: "Forms" },
-  { name: "1Password", icon: Key, category: "Security" },
-  { name: "Webflow", icon: Layout, category: "Website Builder" },
-  { name: "Asana", icon: List, category: "Project Management" },
-  { name: "Auth0", icon: Lock, category: "Security" },
-  { name: "Mapbox", icon: Map, category: "Maps" },
-  { name: "Screenflow", icon: Monitor, category: "Video" },
-  { name: "Spotify Ads", icon: Music, category: "Advertising" },
-  { name: "Waze Ads", icon: Navigation, category: "Advertising" },
-  { name: "Shippo", icon: Package, category: "Shipping" },
-  { name: "Evernote", icon: Paperclip, category: "Notes" },
-  { name: "Twilio", icon: Phone, category: "Communication" },
-  { name: "PrintFlow", icon: Printer, category: "Print" },
-  { name: "Anchor", icon: Radio, category: "Podcasts" },
-  { name: "SyncWith", icon: RefreshCw, category: "Integration" },
-  { name: "Feedly", icon: Rss, category: "Content" },
-  { name: "Autosave Pro", icon: Save, category: "Productivity" },
-  { name: "SendGrid", icon: Send, category: "Email" },
-  { name: "DigitalOcean", icon: Server, category: "Cloud" },
-  { name: "IFTTT", icon: Shuffle, category: "Automation" },
-  { name: "Amplitude", icon: Sliders, category: "Analytics" },
-  { name: "App Annie", icon: Smartphone, category: "Analytics" },
-  { name: "Clubhouse", icon: Speaker, category: "Audio" },
-  { name: "Trustpilot", icon: Star, category: "Reviews" },
-  { name: "Toggl", icon: Sun, category: "Time Tracking" },
-  { name: "Labelbox", icon: Tag, category: "Data" },
-  { name: "Facebook Ads", icon: ThumbsUp, category: "Advertising" },
-  { name: "CleanMyMac", icon: Trash, category: "Utility" },
-  { name: "ShipStation", icon: Truck, category: "Shipping" },
-  { name: "YouTube Studio", icon: Tv, category: "Video" },
-  { name: "Uploadcare", icon: Upload, category: "Media" },
-  { name: "Podcast App", icon: Volume2, category: "Podcasts" },
-  { name: "Speedtest", icon: Wifi, category: "Utility" },
-  { name: "Tailwind CSS", icon: Wind, category: "Development" },
-  { name: "Xero", icon: Wrench, category: "Accounting" },
-];
-
-const categories = [...new Set(allTools.map(tool => tool.category))].sort();
+interface Tool {
+  id: string;
+  name: string;
+  description: string | null;
+  tool_url: string | null;
+  icon_url: string | null;
+  category: string | null;
+  is_featured: boolean;
+  is_published: boolean;
+  created_at: string;
+}
 
 const Tools = () => {
+  const [tools, setTools] = useState<Tool[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingTool, setEditingTool] = useState<Tool | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
-  const filteredTools = allTools.filter(tool => {
+  const { isAdmin } = useAuth();
+  const { toast } = useToast();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    tool_url: "",
+    icon_url: "",
+    category: "",
+    is_featured: false,
+    is_published: true,
+  });
+
+  useEffect(() => {
+    fetchTools();
+  }, []);
+
+  const fetchTools = async () => {
+    if (!isSupabaseConfigured) {
+      setIsLoading(false);
+      setError("Database not configured. Please set up Supabase credentials.");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const { data, error: fetchError } = await supabase
+        .from("tools")
+        .select("*")
+        .eq("is_published", true)
+        .order("is_featured", { ascending: false })
+        .order("name", { ascending: true });
+
+      if (fetchError) {
+        throw fetchError;
+      }
+
+      setTools(data || []);
+    } catch (err: any) {
+      console.error("Error fetching tools:", err);
+      setError(err.message || "Failed to load tools");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const categories = [...new Set(tools.map(tool => tool.category).filter(Boolean))].sort() as string[];
+
+  const filteredTools = tools.filter(tool => {
     const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          tool.category.toLowerCase().includes(searchQuery.toLowerCase());
+                          (tool.category?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
+                          (tool.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
     const matchesCategory = !selectedCategory || tool.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      description: "",
+      tool_url: "",
+      icon_url: "",
+      category: "",
+      is_featured: false,
+      is_published: true,
+    });
+    setEditingTool(null);
+  };
+
+  const openAddDialog = () => {
+    resetForm();
+    setIsDialogOpen(true);
+  };
+
+  const openEditDialog = (tool: Tool) => {
+    setEditingTool(tool);
+    setFormData({
+      name: tool.name,
+      description: tool.description || "",
+      tool_url: tool.tool_url || "",
+      icon_url: tool.icon_url || "",
+      category: tool.category || "",
+      is_featured: tool.is_featured,
+      is_published: tool.is_published,
+    });
+    setIsDialogOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const toolData = {
+        name: formData.name,
+        description: formData.description || null,
+        tool_url: formData.tool_url || null,
+        icon_url: formData.icon_url || null,
+        category: formData.category || null,
+        is_featured: formData.is_featured,
+        is_published: formData.is_published,
+      };
+
+      if (editingTool) {
+        const { error } = await (supabase as any)
+          .from("tools")
+          .update(toolData)
+          .eq("id", editingTool.id);
+
+        if (error) throw error;
+        toast({ title: "Tool updated successfully" });
+      } else {
+        const { error } = await (supabase as any)
+          .from("tools")
+          .insert(toolData);
+
+        if (error) throw error;
+        toast({ title: "Tool created successfully" });
+      }
+
+      setIsDialogOpen(false);
+      resetForm();
+      fetchTools();
+    } catch (err: any) {
+      console.error("Error saving tool:", err);
+      toast({
+        title: "Error",
+        description: err.message || "Failed to save tool",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("tools")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      toast({ title: "Tool deleted successfully" });
+      setDeleteConfirmId(null);
+      fetchTools();
+    } catch (err: any) {
+      console.error("Error deleting tool:", err);
+      toast({
+        title: "Error",
+        description: err.message || "Failed to delete tool",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleToolClick = (tool: Tool) => {
+    if (tool.tool_url) {
+      window.open(tool.tool_url, "_blank", "noopener,noreferrer");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -126,7 +220,7 @@ const Tools = () => {
                 <span className="text-gradient">Tools Library</span>
               </h1>
               <p className="text-muted-foreground text-lg mb-8">
-                Explore 75+ essential digital marketing tools. Learn how to use each one effectively in our courses.
+                Explore essential digital marketing tools. Learn how to use each one effectively in our courses.
               </p>
 
               {/* Search */}
@@ -140,76 +234,251 @@ const Tools = () => {
                   className="pl-12 h-12 bg-background border-border"
                 />
               </div>
+
+              {isAdmin && (
+                <Button onClick={openAddDialog} className="mt-6">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Tool
+                </Button>
+              )}
             </div>
           </div>
         </section>
 
         {/* Category Filters */}
-        <section className="py-6 border-b border-border">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-wrap gap-2 justify-center">
-              <button
-                onClick={() => setSelectedCategory(null)}
-                className={`px-4 py-2 rounded-full text-sm transition-all ${
-                  !selectedCategory
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
-                }`}
-              >
-                All Tools
-              </button>
-              {categories.map((category) => (
+        {!isLoading && !error && categories.length > 0 && (
+          <section className="py-6 border-b border-border">
+            <div className="container mx-auto px-4">
+              <div className="flex flex-wrap gap-2 justify-center">
                 <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
+                  onClick={() => setSelectedCategory(null)}
                   className={`px-4 py-2 rounded-full text-sm transition-all ${
-                    selectedCategory === category
+                    !selectedCategory
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-muted-foreground hover:bg-muted/80"
                   }`}
                 >
-                  {category}
+                  All Tools
                 </button>
-              ))}
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`px-4 py-2 rounded-full text-sm transition-all ${
+                      selectedCategory === category
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Tools Grid */}
         <section className="py-16">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {filteredTools.map((tool) => {
-                const Icon = tool.icon;
-                return (
-                  <div
-                    key={tool.name}
-                    className="group glass rounded-xl p-6 flex flex-col items-center text-center transition-all duration-300 hover:scale-105 hover:glow-teal cursor-pointer"
-                  >
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-3 transition-transform group-hover:scale-110">
-                      <Icon className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-medium text-sm text-foreground mb-1">
-                      {tool.name}
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      {tool.category}
-                    </p>
-                    <ExternalLink className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 mt-2 transition-opacity" />
-                  </div>
-                );
-              })}
-            </div>
-
-            {filteredTools.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No tools found matching your search.</p>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <span className="ml-3 text-muted-foreground">Loading tools...</span>
               </div>
+            ) : error ? (
+              <div className="text-center py-20">
+                <p className="text-destructive mb-4">{error}</p>
+                <Button onClick={fetchTools} variant="outline">
+                  Try Again
+                </Button>
+              </div>
+            ) : tools.length === 0 ? (
+              <div className="text-center py-20">
+                <Wrench className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
+                <h3 className="text-xl font-semibold mb-2">No tools available yet</h3>
+                <p className="text-muted-foreground">
+                  Check back soon for our curated list of marketing tools.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                  {filteredTools.map((tool) => (
+                    <div
+                      key={tool.id}
+                      className="group glass rounded-xl p-6 flex flex-col items-center text-center transition-all duration-300 hover:scale-105 hover:glow-teal cursor-pointer relative"
+                      onClick={() => handleToolClick(tool)}
+                    >
+                      {isAdmin && (
+                        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            size="icon"
+                            variant="secondary"
+                            className="h-6 w-6"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditDialog(tool);
+                            }}
+                          >
+                            <Pencil className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="destructive"
+                            className="h-6 w-6"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteConfirmId(tool.id);
+                            }}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      )}
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-3 transition-transform group-hover:scale-110">
+                        {tool.icon_url ? (
+                          <img src={tool.icon_url} alt={tool.name} className="w-6 h-6 object-contain" />
+                        ) : (
+                          <Wrench className="w-6 h-6 text-primary" />
+                        )}
+                      </div>
+                      <h3 className="font-medium text-sm text-foreground mb-1">
+                        {tool.name}
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        {tool.category || "General"}
+                      </p>
+                      <ExternalLink className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 mt-2 transition-opacity" />
+                    </div>
+                  ))}
+                </div>
+
+                {filteredTools.length === 0 && (
+                  <div className="text-center py-12">
+                    <p className="text-muted-foreground">No tools found matching your search.</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </section>
       </main>
       <Footer />
+
+      {/* Add/Edit Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{editingTool ? "Edit Tool" : "Add New Tool"}</DialogTitle>
+            <DialogDescription>
+              {editingTool ? "Update the tool details below." : "Fill in the details to add a new tool."}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name *</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={2}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="tool_url">Tool URL</Label>
+                <Input
+                  id="tool_url"
+                  value={formData.tool_url}
+                  onChange={(e) => setFormData({ ...formData, tool_url: e.target.value })}
+                  placeholder="https://example.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <Input
+                  id="category"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  placeholder="e.g. Analytics, SEO"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="icon_url">Icon URL</Label>
+              <Input
+                id="icon_url"
+                value={formData.icon_url}
+                onChange={(e) => setFormData({ ...formData, icon_url: e.target.value })}
+                placeholder="https://example.com/icon.png"
+              />
+            </div>
+            <div className="flex items-center gap-6">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is_featured"
+                  checked={formData.is_featured}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_featured: checked })}
+                />
+                <Label htmlFor="is_featured">Featured</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is_published"
+                  checked={formData.is_published}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_published: checked })}
+                />
+                <Label htmlFor="is_published">Published</Label>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  editingTool ? "Update Tool" : "Create Tool"
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Tool</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this tool? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={() => deleteConfirmId && handleDelete(deleteConfirmId)}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

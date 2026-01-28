@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 
 type UserRole = "student" | "admin" | "instructor";
 
@@ -9,6 +9,8 @@ interface UserProfile {
   email: string;
   role: UserRole;
   name: string;
+  student_id?: string | null;
+  is_confirmed?: boolean;
 }
 
 interface AuthContextType {
@@ -17,6 +19,7 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   isLoading: boolean;
   signOut: () => Promise<void>;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -30,6 +33,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setIsLoading(false);
+      return;
+    }
+
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setUser(data.session?.user ?? null);
@@ -60,68 +68,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchUserProfile = async (authUser: User) => {
     try {
-      // Try student
-      const { data: student } = await (supabase as any)
-        .from("students")
-        .select("id, name, role")
-        .eq("user_id", authUser.id)
+      const { data: profile, error } = await (supabase as any)
+        .from("profiles")
+        .select("id, name, role, student_id, is_confirmed")
+        .eq("id", authUser.id)
         .maybeSingle();
 
-      if (student) {
-        setUserProfile({
-          id: student.id,
-          name: student.name ?? "Student",
-          role: "student",
-          email: authUser.email ?? "",
-        });
-        setIsLoading(false);
-        return;
+      if (error) {
+        console.error("Error fetching profile:", error);
       }
 
-      // Try admin
-      const { data: admin } = await (supabase as any)
-        .from("admins")
-        .select("id, name")
-        .eq("user_id", authUser.id)
-        .maybeSingle();
-
-      if (admin) {
+      if (profile) {
         setUserProfile({
-          id: admin.id,
-          name: admin.name ?? "Admin",
-          role: "admin",
+          id: profile.id,
+          name: profile.name ?? "User",
+          role: profile.role as UserRole,
           email: authUser.email ?? "",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      // Create default student
-      const { data: newStudent } = await (supabase as any)
-        .from("students")
-        .insert({
-          user_id: authUser.id,
-          name: authUser.email?.split("@")[0] ?? "Student",
-          role: "student",
-        })
-        .select()
-        .single();
-
-      if (newStudent) {
-        setUserProfile({
-          id: newStudent.id,
-          name: newStudent.name,
-          role: "student",
-          email: authUser.email ?? "",
+          student_id: profile.student_id,
+          is_confirmed: profile.is_confirmed,
         });
       } else {
-        throw new Error("Failed to create student profile");
+        const userName = authUser.user_metadata?.full_name || 
+                        authUser.email?.split("@")[0] || "User";
+        const userType = authUser.user_metadata?.user_type || "student";
+        
+        const { data: newProfile, error: insertError } = await (supabase as any)
+          .from("profiles")
+          .insert({
+            id: authUser.id,
+            email: authUser.email ?? "",
+            name: userName,
+            role: userType,
+            is_confirmed: false,
+          })
+          .select()
+          .single();
+
+        if (insertError) {
+          console.error("Error creating profile:", insertError);
+          setUserProfile({
+            id: authUser.id,
+            name: userName,
+            role: userType as UserRole,
+            email: authUser.email ?? "",
+          });
+        } else if (newProfile) {
+          setUserProfile({
+            id: newProfile.id,
+            name: newProfile.name,
+            role: newProfile.role as UserRole,
+            email: authUser.email ?? "",
+            student_id: newProfile.student_id,
+            is_confirmed: newProfile.is_confirmed,
+          });
+        }
       }
     } catch (err) {
       console.error("Auth profile error:", err);
       setUserProfile({
         id: authUser.id,
-        name: "Student",
+        name: authUser.email?.split("@")[0] ?? "User",
         role: "student",
         email: authUser.email ?? "",
       });
@@ -137,9 +143,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setUserProfile(null);
   };
 
+  const isAdmin = userProfile?.role === "admin";
+
   return (
     <AuthContext.Provider
-      value={{ session, user, userProfile, isLoading, signOut }}
+      value={{ session, user, userProfile, isLoading, signOut, isAdmin }}
     >
       {children}
     </AuthContext.Provider>

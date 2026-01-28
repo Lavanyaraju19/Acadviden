@@ -33,3 +33,9 @@ waitForPort = 5000
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[userenv]
+
+[userenv.shared]
+VITE_SUPABASE_URL = "https://uzapgcifvklkrtvglzuc.supabase.co"
+VITE_SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6YXBnY2lmdmtsa3J0dmdsenVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzNjE0MTQsImV4cCI6MjA4NDkzNzQxNH0.ArKL8zvxKL3oEQV5EHmRFq_Cdyar-9K6HlPLfTCDGcc"
