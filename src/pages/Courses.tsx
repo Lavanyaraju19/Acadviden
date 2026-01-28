@@ -112,7 +112,11 @@ const Courses = () => {
       setCourses(data || []);
     } catch (err: any) {
       console.error("Error fetching courses:", err);
-      setError(err.message || "Failed to load courses");
+      if (err.code === "42703" || err.message?.includes("does not exist")) {
+        setError("Database tables not set up. Please run the migration in Supabase SQL Editor.");
+      } else {
+        setError(err.message || "Failed to load courses");
+      }
     } finally {
       setIsLoading(false);
     }

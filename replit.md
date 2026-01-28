@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **January 28, 2026**: Connected frontend to Supabase backend
+  - Fixed AuthContext to use `profiles` table with proper role-based access
+  - Connected Courses page to fetch from Supabase with loading/error/empty states
+  - Connected Tools page to fetch from Supabase with loading/error/empty states
+  - Added admin-only CRUD operations (Add, Edit, Delete) for courses and tools
+  - Login uses `supabase.auth.signInWithPassword()` 
+  - Registration uses `supabase.auth.signUp()` with profile creation
+  - Supabase credentials configured via environment variables
+
 - **January 2026**: Added production-ready backend with complete Supabase database schema
 - Added SQL migration files for all database tables
 - Implemented backend services for registration, admin CRUD, payments, email, and Google Sheets integration

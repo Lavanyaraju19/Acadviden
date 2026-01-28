@@ -84,7 +84,11 @@ const Tools = () => {
       setTools(data || []);
     } catch (err: any) {
       console.error("Error fetching tools:", err);
-      setError(err.message || "Failed to load tools");
+      if (err.code === "42703" || err.message?.includes("does not exist")) {
+        setError("Database tables not set up. Please run the migration in Supabase SQL Editor.");
+      } else {
+        setError(err.message || "Failed to load tools");
+      }
     } finally {
       setIsLoading(false);
     }
