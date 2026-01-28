@@ -5,15 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npx vite build",
+    "build": "node node_modules/vite/bin/vite.js build",
     "preview": "vite preview",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest"
-  },
-  "engines": {
-    "node": "20.x",
-    "npm": "10.x"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
