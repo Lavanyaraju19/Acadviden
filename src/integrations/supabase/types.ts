@@ -7,20 +7,560 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.1"
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          id: string
+          email: string
+          name: string
+          phone: string | null
+          role: 'student' | 'admin' | 'instructor'
+          student_id: string | null
+          mode: 'online' | 'offline' | null
+          is_confirmed: boolean
+          payment_status: 'pending' | 'paid' | 'failed' | 'refunded'
+          avatar_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          email: string
+          name: string
+          phone?: string | null
+          role?: 'student' | 'admin' | 'instructor'
+          student_id?: string | null
+          mode?: 'online' | 'offline' | null
+          is_confirmed?: boolean
+          payment_status?: 'pending' | 'paid' | 'failed' | 'refunded'
+          avatar_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          name?: string
+          phone?: string | null
+          role?: 'student' | 'admin' | 'instructor'
+          student_id?: string | null
+          mode?: 'online' | 'offline' | null
+          is_confirmed?: boolean
+          payment_status?: 'pending' | 'paid' | 'failed' | 'refunded'
+          avatar_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      courses: {
+        Row: {
+          id: string
+          title: string
+          description: string | null
+          slug: string
+          thumbnail_url: string | null
+          duration_weeks: number
+          is_published: boolean
+          is_featured: boolean
+          price: number
+          discount_price: number | null
+          mode: 'online' | 'offline' | 'hybrid'
+          max_students: number | null
+          start_date: string | null
+          end_date: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          description?: string | null
+          slug: string
+          thumbnail_url?: string | null
+          duration_weeks?: number
+          is_published?: boolean
+          is_featured?: boolean
+          price?: number
+          discount_price?: number | null
+          mode?: 'online' | 'offline' | 'hybrid'
+          max_students?: number | null
+          start_date?: string | null
+          end_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string | null
+          slug?: string
+          thumbnail_url?: string | null
+          duration_weeks?: number
+          is_published?: boolean
+          is_featured?: boolean
+          price?: number
+          discount_price?: number | null
+          mode?: 'online' | 'offline' | 'hybrid'
+          max_students?: number | null
+          start_date?: string | null
+          end_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      modules: {
+        Row: {
+          id: string
+          course_id: string
+          title: string
+          description: string | null
+          order_index: number
+          duration_minutes: number | null
+          is_published: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          course_id: string
+          title: string
+          description?: string | null
+          order_index?: number
+          duration_minutes?: number | null
+          is_published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          course_id?: string
+          title?: string
+          description?: string | null
+          order_index?: number
+          duration_minutes?: number | null
+          is_published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      videos: {
+        Row: {
+          id: string
+          module_id: string
+          title: string
+          description: string | null
+          video_url: string
+          thumbnail_url: string | null
+          duration_seconds: number | null
+          order_index: number
+          is_published: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          module_id: string
+          title: string
+          description?: string | null
+          video_url: string
+          thumbnail_url?: string | null
+          duration_seconds?: number | null
+          order_index?: number
+          is_published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          module_id?: string
+          title?: string
+          description?: string | null
+          video_url?: string
+          thumbnail_url?: string | null
+          duration_seconds?: number | null
+          order_index?: number
+          is_published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      pdfs: {
+        Row: {
+          id: string
+          module_id: string
+          title: string
+          description: string | null
+          file_url: string
+          file_size_bytes: number | null
+          order_index: number
+          is_published: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          module_id: string
+          title: string
+          description?: string | null
+          file_url: string
+          file_size_bytes?: number | null
+          order_index?: number
+          is_published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          module_id?: string
+          title?: string
+          description?: string | null
+          file_url?: string
+          file_size_bytes?: number | null
+          order_index?: number
+          is_published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      tools: {
+        Row: {
+          id: string
+          module_id: string | null
+          name: string
+          description: string | null
+          tool_url: string | null
+          icon_url: string | null
+          category: string | null
+          is_featured: boolean
+          is_published: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          module_id?: string | null
+          name: string
+          description?: string | null
+          tool_url?: string | null
+          icon_url?: string | null
+          category?: string | null
+          is_featured?: boolean
+          is_published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          module_id?: string | null
+          name?: string
+          description?: string | null
+          tool_url?: string | null
+          icon_url?: string | null
+          category?: string | null
+          is_featured?: boolean
+          is_published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      enrollments: {
+        Row: {
+          id: string
+          student_id: string
+          course_id: string
+          status: 'pending' | 'active' | 'completed' | 'suspended' | 'cancelled'
+          enrolled_at: string
+          completed_at: string | null
+          progress_percentage: number
+          certificate_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          student_id: string
+          course_id: string
+          status?: 'pending' | 'active' | 'completed' | 'suspended' | 'cancelled'
+          enrolled_at?: string
+          completed_at?: string | null
+          progress_percentage?: number
+          certificate_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          student_id?: string
+          course_id?: string
+          status?: 'pending' | 'active' | 'completed' | 'suspended' | 'cancelled'
+          enrolled_at?: string
+          completed_at?: string | null
+          progress_percentage?: number
+          certificate_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      payments: {
+        Row: {
+          id: string
+          student_id: string
+          enrollment_id: string | null
+          amount: number
+          currency: string
+          payment_mode: 'razorpay' | 'bank_transfer' | 'cash' | 'upi' | 'card' | 'other' | null
+          status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded' | 'cancelled'
+          transaction_id: string | null
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          razorpay_signature: string | null
+          payment_date: string | null
+          notes: string | null
+          receipt_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          student_id: string
+          enrollment_id?: string | null
+          amount: number
+          currency?: string
+          payment_mode?: 'razorpay' | 'bank_transfer' | 'cash' | 'upi' | 'card' | 'other' | null
+          status?: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded' | 'cancelled'
+          transaction_id?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          payment_date?: string | null
+          notes?: string | null
+          receipt_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          student_id?: string
+          enrollment_id?: string | null
+          amount?: number
+          currency?: string
+          payment_mode?: 'razorpay' | 'bank_transfer' | 'cash' | 'upi' | 'card' | 'other' | null
+          status?: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded' | 'cancelled'
+          transaction_id?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          payment_date?: string | null
+          notes?: string | null
+          receipt_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      progress: {
+        Row: {
+          id: string
+          student_id: string
+          module_id: string
+          video_id: string | null
+          pdf_id: string | null
+          is_completed: boolean
+          completed_at: string | null
+          watch_time_seconds: number
+          last_position_seconds: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          student_id: string
+          module_id: string
+          video_id?: string | null
+          pdf_id?: string | null
+          is_completed?: boolean
+          completed_at?: string | null
+          watch_time_seconds?: number
+          last_position_seconds?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          student_id?: string
+          module_id?: string
+          video_id?: string | null
+          pdf_id?: string | null
+          is_completed?: boolean
+          completed_at?: string | null
+          watch_time_seconds?: number
+          last_position_seconds?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      certificates: {
+        Row: {
+          id: string
+          student_id: string
+          course_id: string
+          enrollment_id: string
+          certificate_number: string
+          certificate_url: string | null
+          issued_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          student_id: string
+          course_id: string
+          enrollment_id: string
+          certificate_number: string
+          certificate_url?: string | null
+          issued_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          student_id?: string
+          course_id?: string
+          enrollment_id?: string
+          certificate_number?: string
+          certificate_url?: string | null
+          issued_at?: string
+          created_at?: string
+        }
+      }
+      registrations: {
+        Row: {
+          id: string
+          name: string
+          email: string
+          phone: string
+          mode: 'online' | 'offline'
+          status: 'pending' | 'confirmed' | 'rejected' | 'cancelled'
+          source: string
+          google_sheet_synced: boolean
+          google_sheet_row_id: number | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          email: string
+          phone: string
+          mode: 'online' | 'offline'
+          status?: 'pending' | 'confirmed' | 'rejected' | 'cancelled'
+          source?: string
+          google_sheet_synced?: boolean
+          google_sheet_row_id?: number | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          email?: string
+          phone?: string
+          mode?: 'online' | 'offline'
+          status?: 'pending' | 'confirmed' | 'rejected' | 'cancelled'
+          source?: string
+          google_sheet_synced?: boolean
+          google_sheet_row_id?: number | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      notifications: {
+        Row: {
+          id: string
+          user_id: string
+          type: 'info' | 'success' | 'warning' | 'error' | 'course' | 'payment' | 'certificate'
+          title: string
+          message: string
+          is_read: boolean
+          action_url: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          type: 'info' | 'success' | 'warning' | 'error' | 'course' | 'payment' | 'certificate'
+          title: string
+          message: string
+          is_read?: boolean
+          action_url?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          type?: 'info' | 'success' | 'warning' | 'error' | 'course' | 'payment' | 'certificate'
+          title?: string
+          message?: string
+          is_read?: boolean
+          action_url?: string | null
+          created_at?: string
+        }
+      }
+      email_logs: {
+        Row: {
+          id: string
+          to_email: string
+          subject: string
+          template: string | null
+          status: 'pending' | 'sent' | 'failed'
+          error_message: string | null
+          sent_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          to_email: string
+          subject: string
+          template?: string | null
+          status?: 'pending' | 'sent' | 'failed'
+          error_message?: string | null
+          sent_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          to_email?: string
+          subject?: string
+          template?: string | null
+          status?: 'pending' | 'sent' | 'failed'
+          error_message?: string | null
+          sent_at?: string | null
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_student_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_certificate_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
