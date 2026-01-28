@@ -9,8 +9,5 @@
         "buildCommand": "npx vite build"
       }
     }
-  ],
-  "engines": {
-    "node": "20.x"
-  }
+  ]
 }
