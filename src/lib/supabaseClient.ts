@@ -1,10 +1,18 @@
 import { createClient } from '@supabase/supabase-js'
 
+// Read environment variables from Vite
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Supabase is not configured. Please check VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY')
+// Debug: check if variables are loaded
+console.log('Supabase URL:', supabaseUrl)
+console.log('Supabase Key:', supabaseAnonKey)
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    'Supabase is not configured. Please check .env.local and Vercel environment variables'
+  )
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey)
+// Export the Supabase client
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
